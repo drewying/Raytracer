@@ -1,6 +1,8 @@
 raytracer
 =========
 
+![alt tag](http://drew.thinkpeopletech.com/25000.png)
+
 A ray tracer. Features the following:
 
 
@@ -21,5 +23,13 @@ A ray tracer. Features the following:
 -Perlin Noise generator.
 
 -Leverages OpenMP for fast rendering.
+
+TODO:
+
+Add scene parser
+
+Add more image output options
+
+Change some of the value passing to passing by const ref
 
 
