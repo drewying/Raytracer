@@ -183,8 +183,6 @@ Color Scene::tracePath(const Ray &ray, int depth, int time) const{
 
     Color finalColor = hit.getMaterial()->emmitColor(hit, time);
 
-    double survival = 1.0;
-
     const int maxRayDepth = 10;
     if (depth > maxRayDepth) {
         return Color(0,0,0);
@@ -202,7 +200,7 @@ Color Scene::tracePath(const Ray &ray, int depth, int time) const{
     //double cosphi = 2.0 * Dot(hit.getNormal(), newRay.direction());
     //finalColor += ((matColor * newRayReflectColor) * cosphi) * survival;
     //Importance
-    finalColor += (matColor * newRayReflectColor) * survival;
+    finalColor += (matColor * newRayReflectColor);
 
     return finalColor;
 }

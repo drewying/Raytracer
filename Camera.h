@@ -28,7 +28,6 @@ public:
     double focalLength;
     int sampleCount;
     CameraMode cameraMode = PathTrace;
-    bool disableDepthOfField = true;
     int xResolution;
     int yResolution;
 
