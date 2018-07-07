@@ -22,7 +22,7 @@ class Image {
     data[y][x] = p;
   }
   void write(const std::string& filename) const;
-  double aspect_ratio() const {
+  double aspectRatio() const {
     return double(xres)/double(yres);
   }
   int getXresolution() {

@@ -13,7 +13,6 @@
 #include <iostream>
 #include <stdlib.h>
 #include <random>
-#include <MacTypes.h>
 
 Scene::Scene() {
     background = 0;
@@ -24,8 +23,6 @@ Scene::~Scene() {
     delete background;
     for (auto shape : shapes)
         delete shape;
-    for (auto light : lights)
-        delete light;
 }
 
 HitRecord Scene::getClosestIntersection(const Ray &ray, bool includeLights, int time) const {
@@ -71,7 +68,6 @@ void Scene::buildPhotonMap(int time){
         }
     }
 
-    //photonMap.scale_photon_power(0.005/lights.size());
     photonMap.scale_photon_power(0.005/lights.size());
     std::cout << "Balancing Photon Map" << std::endl;
     photonMap.balance();
@@ -127,22 +123,27 @@ Color Scene::tracePhoton(const Ray &ray, int time) const {
 }
 
 std::vector<Shape*> Scene::getLights(int time) const{
-    static std::vector<Shape*> li;
-    if (li.size() == 0){
+    static std::vector<Shape*> lights;
+    if (lights.size() == 0){
         for (auto shape : shapes) {
             auto emit = shape->matl->emmitColor(HitRecord(DBL_MAX), time);
             if (emit.r() > 0.0 || emit.b() > 0.0 || emit.g() > 0.0){
-                li.push_back(shape);
+                lights.push_back(shape);
             }
         }
     }
-    return li;
+    return lights;
 }
 
 Color Scene::traceRay(const Ray &ray, int time) const {
     HitRecord hit = getClosestIntersection(ray, false, time);
     if (hit.didHit() == false){
-        return background->getBackgroundColor(ray);
+        if (background != nullptr) {
+            return background->getBackgroundColor(ray);
+        } else {
+            return Color(0.0, 0.0, 0.0);
+        }
+        
     }
 
     if (hit.getMaterial()->isDiffuse() == false){
@@ -150,9 +151,9 @@ Color Scene::traceRay(const Ray &ray, int time) const {
     }
 
     Color finalColor = Color(0,0,0);
-    auto li = getLights(time);
+    auto lights = getLights(time);
 
-    for (auto l : li){
+    for (auto l : lights){
         Vector normal = hit.getNormal();
         normal.normalize();
         Vector lightDirection = l->getBounds(time).center() - hit.getHitPosition();
@@ -183,7 +184,7 @@ Color Scene::tracePath(const Ray &ray, int depth, int time) const{
 
     Color finalColor = hit.getMaterial()->emmitColor(hit, time);
 
-    const int maxRayDepth = 10;
+    const int maxRayDepth = 5;
     if (depth > maxRayDepth) {
         return Color(0,0,0);
     }
@@ -194,7 +195,7 @@ Color Scene::tracePath(const Ray &ray, int depth, int time) const{
 
     Ray newRay = hit.getMaterial()->bounce(hit, time);
     Color matColor = hit.getMaterial()->materialColor(hit, time);
-    Color newRayReflectColor = tracePath(newRay, depth+1, time);
+    Color newRayReflectColor = tracePath(newRay, depth + 1, time);
 
     //Uniform
     //double cosphi = 2.0 * Dot(hit.getNormal(), newRay.direction());

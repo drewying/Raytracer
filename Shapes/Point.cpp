@@ -1,4 +1,4 @@
-#include <float.h>
+#include <cfloat>
 #include "Point.h"
 #include "../HitRecord.h"
 #include "../Ray.h"

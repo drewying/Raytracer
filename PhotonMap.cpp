@@ -11,10 +11,11 @@
 */
 
 #include "PhotonMap.h"
+#define _USE_MATH_DEFINES
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <cmath>
 
 /* This is the constructor for the photon map.
  * To create the photon map it is necessary to specify the
@@ -43,7 +44,7 @@ PhotonMap :: PhotonMap( const int max_phot )
     //----------------------------------------
 
     for (int i=0; i<256; i++) {
-        double angle = double(i)*(1.0/256.0)*M_PI;
+        double angle = double(i) * (1.0/256.0) * M_PI;
         costheta[i] = cos( angle );
         sintheta[i] = sin( angle );
         cosphi[i]   = cos( 2.0*angle );

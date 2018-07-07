@@ -36,25 +36,20 @@
 #include <thread>
 
 Scene* setupScene();
-Scene* setupBezierScene();
 void takePicture(Camera* camera, Scene *scene, int timePosition);
 void takeMovie(Camera *camera, Scene *scene, int seconds);
 
 int main(int argc, char **argv) {
 
-    Vector eye = Vector(0.0, 0.0, 20.0);
-    Vector lookat = Vector(0.0, 0.0, -1.0);
-    Vector up = Vector(0, 1, 0);
-    Vector right = Vector(1,0,0);
-    Camera *camera = new Camera(eye, lookat, up, right);
-    camera->xResolution = 800;
-    camera->yResolution = 600;
-    camera->cameraMode =  PathTrace;
-    camera->focalLength = 21.5;
-    camera->apertureSize = 1.0;
-    camera->sampleCount = 25000;
+    Vector position      = Vector(0.0, 0.0,  1.0);
+    Vector lookAt        = Vector(0.0, 0.0, -1.0);
+    Camera *camera       = new Camera(position, lookAt, 800, 600);
+    camera->cameraMode   = RayTrace;
+    camera->focalLength  = 51.47;
+    camera->apertureSize = 0.0;
+    camera->fieldOfView  = 90;
+    camera->sampleCount  = 1;
 
-    //Scene *scene = setupBezierScene();
     Scene *scene = setupScene();
     takePicture(camera, scene, 1);
     //takeMovie(camera, scene, 30);
@@ -63,7 +58,7 @@ int main(int argc, char **argv) {
 }
 
 void takeMovie(Camera *camera, Scene *scene, int seconds){
-    system("rm out.mpeg");
+    // system("rm out.mpeg");
 
     double frames = seconds * 30;
 
@@ -110,12 +105,7 @@ void takePicture(Camera* camera, Scene *scene, int timePosition){
     double t1 = Time::currentSeconds();
     std::cout << "Beginning Picture Render..." << std::endl;
     Image *image = camera->render(scene, timePosition);
-    image->write("out.ppm");
-    std::string command = "/usr/local/bin/convert out.ppm out.png";
-    system(command.c_str());
-    command = "rm out.ppm";
-    system(command.c_str());
-
+    image->write("out.bmp");
     double t4 = Time::currentSeconds();
     std::cout << "Render finished. Total time:" << std::setprecision(3) << t4 - t1 << " seconds" << std::endl;
 }
@@ -162,42 +152,38 @@ Scene* setupScene(){
 
 
 
-    LightMaterial *lightMaterial = new LightMaterial(Color(40.0,37.5,35.0));
+    LightMaterial *lightMaterial = new LightMaterial(Color(50.0, 50.0, 50.0));
     Triangle *light  = new Triangle(lightMaterial, pointA, pointE, pointG);
     Triangle *light1 = new Triangle(lightMaterial, pointB, pointH, pointE);
     Triangle *light2 = new Triangle(lightMaterial, pointC, pointF, pointI);
     Triangle *light3 = new Triangle(lightMaterial, pointD, pointJ, pointF);
 
-    Sphere *glassSphere = new Sphere(new GlassMaterial(1.5, 0.1), Vector(4.0,-4.0, -6.0), 4.0);
+    Sphere *sphere =  new Sphere(new GlassMaterial(1.5, 0.1), Vector( 0.35, -0.7, -0.5), 0.3);
+    Sphere *sphere1 = new Sphere(new MetalMaterial(),         Vector(-0.5, -0.7, -0.7), 0.3);
+    //Sphere *glassSphere = new Sphere(new GlassMaterial(1.5, 0.1), Vector(4.0,-4.0, -6.0), 4.0);
     //Sphere *glassSphere1 = new Sphere(new GlassMaterial(1.5, 0.1), Vector(-5.0,-4.5, -10.0), 3.5);
 
 
-    BPTModel *teapot = new BPTModel(marbleMaterial, "teapot.bpt", true);
-    ShapeInstance *instance = new ShapeInstance(teapot);
-    instance->transformMatrix.addFrame(0, translate(-3.5,-8.0,-4.0) * rotateX(-M_PI/2.0) * rotateZ(4.1) * scale(1.75,1.75,1.75));
-    std::cout << instance->getBounds(0).center() << std::endl;
+    //BPTModel *teapot = new BPTModel(marbleMaterial, "teapot.bpt", true);
+    //ShapeInstance *instance = new ShapeInstance(teapot);
+    //instance->transformMatrix.addFrame(0, translate(-3.5,-8.0,-4.0) * rotateX(-M_PI/2.0) * rotateZ(4.1) * scale(1.75,1.75,1.75));
+    //std::cout << instance->getBounds(0).center() << std::endl;
 
-    auto bmpTexture = new BitmapTextureMaterial("study1.bmp");
+    //auto bmpTexture = new BitmapTextureMaterial("study1.bmp");
 
-    Plane *left = new Plane(new ColorMaterial(WHITE), Vector(30.0,0.0,0.0), Vector(-30.0,0.0,0.0));
-    Plane *right = new Plane(new ColorMaterial(WHITE), Vector(-30.0,0.0,0.0), Vector(30.0,0.0,0.0));
-    Plane *back = new Plane(new ColorMaterial(WHITE), Vector(0.0,0.0,-30.0), Vector(0.0,0.0,30.0));
-    Plane *front = new Plane(bmpTexture, Vector(0.0,0.0,24.0), Vector(0.0,0.0,-24.0));
-    Plane *top = new Plane(new ColorMaterial(WHITE), Vector(0.0,-30.0,0.0), Vector(0.0,30.0,0.0));
-    Plane *bottom = new Plane(new ColorMaterial(WHITE), Vector(0.0,30.0,0.0), Vector(0.0,-30.0,0.0));
-
-    Triangle *triangle3 = new Triangle(new ColorMaterial(WHITE), Vector(-10, -8.0, -20), Vector(-10, -8.0, 20), Vector(10, -8.0, -20));
-    Triangle *triangle4 = new Triangle(new ColorMaterial(WHITE), Vector(10, -8.0, -20), Vector(-10, -8.0, 20), Vector(10, -8.0, 20));
+    Plane *left   = new Plane(new ColorMaterial(RED),   Vector(  1.0,   0.0,   0.0), Vector( -1.0,  0.0,   0.0));
+    Plane *right  = new Plane(new ColorMaterial(BLUE),  Vector( -1.0,   0.0,   0.0), Vector(  1.0,  0.0,   0.0));
+    Plane *back   = new Plane(new ColorMaterial(WHITE), Vector(  0.0,   0.0,  -1.0), Vector(  0.0,  0.0,   1.0));
+    Plane *front  = new Plane(new ColorMaterial(WHITE), Vector(  0.0,   0.0,   1.0), Vector(  0.0,  0.0,  -1.0));
+    Plane *top    = new Plane(new ColorMaterial(WHITE), Vector(  0.0,  -1.0,   0.0), Vector(  0.0,  1.0,   0.0));
+    Plane *bottom = new Plane(new ColorMaterial(WHITE), Vector(  0.0,   1.0,   0.0), Vector(  0.0, -1.0,   0.0));
 
     Scene *scene = new Scene();
 
-    Point *pointLight = new Point(new LightMaterial(Color(1.0,1.0,1.0)), Vector(0,0,20));
-    //scene->addShape(pointLight);
-    scene->addShape(light);
-    scene->addShape(light3);
-
-    scene->addShape(triangle3);
-    scene->addShape(triangle4);
+    Point *pointLight = new Point(new LightMaterial(Color(1.0, 1.0, 1.0)), Vector(0.0, 0.8, 0.0));
+    scene->addShape(pointLight);
+    //scene->addShape(light);
+    //scene->addShape(light3);
 
 
     scene->addShape(back);
@@ -207,11 +193,8 @@ Scene* setupScene(){
     scene->addShape(right);
     scene->addShape(left);
 
-    scene->addShape(instance);
-    scene->addShape(glassSphere);
-    //scene->addShape(glassSphere1);
-
-    scene->setBackground(background);
+    scene->addShape(sphere);
+    scene->addShape(sphere1);
 
     return scene;
 }

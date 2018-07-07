@@ -1,7 +1,7 @@
 #ifndef Sample_h
 #define Sample_h
 
-#include <math.h>
+#include <cmath>
 #include <vector>
 #include <random>
 

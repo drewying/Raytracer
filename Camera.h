@@ -12,7 +12,7 @@ enum CameraMode { RayTrace, PathTrace, PhotonMapTrace };
 
 class Camera {
 public:
-    Camera(const Vector &eye, const Vector &lookAt, const Vector &up, const Vector &right);
+    Camera(const Vector &position, const Vector &lookAt, const unsigned int xResolution, const unsigned int yResolution);
 
     virtual ~Camera();
 
@@ -20,23 +20,22 @@ public:
 
     virtual Image* render(Scene *scene, double time);
 
-    Vector eye;
-    Vector lookAt;
-    Vector up;
-    Vector right;
-    double apertureSize;
-    double focalLength;
-    int sampleCount;
-    CameraMode cameraMode = PathTrace;
-    int xResolution;
-    int yResolution;
+    Vector position = Vector();
+    Vector lookAt = Vector();
+    Vector up = Vector(0.0, 1.0, 0.0);
+    Vector right = Vector(1.0, 0.0, 0.0);
+    double apertureSize = 0.0;
+    double focalLength = 1.0;
+    int sampleCount = 1;
+    CameraMode cameraMode = RayTrace;
+    unsigned int fieldOfView = 90;
+    unsigned int xResolution = 640;
+    unsigned int yResolution = 480;
 
 private:
     Camera(const Camera &);
-    Camera &operator=(const Camera &);
 
     Color samplePixel(const Scene* scene, double x, double y, int time) const;
-    void preprocess(double aspect_ratio);
 };
 
 #endif

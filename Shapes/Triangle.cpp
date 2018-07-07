@@ -3,7 +3,7 @@
 // Copyright (c) 2014 CS6400. All rights reserved.
 //
 
-#include <float.h>
+#include <cfloat>
 #include "Triangle.h"
 #include "../Vector.h"
 #include "../Materials/Material.h"

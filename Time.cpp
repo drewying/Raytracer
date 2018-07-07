@@ -1,5 +1,5 @@
 #include "Time.h"
-#include <errno.h>
+#include <cerrno>
 
 #ifdef _WIN32
 #include <windows.h>

@@ -8,15 +8,14 @@
 
 class Vector {
 public:
-    Vector() {
-    }
+    Vector() { }
+    ~Vector() { }
 
     Vector(double x, double y, double z) {
         data[0] = x;
         data[1] = y;
         data[2] = z;
     }
-
 
     Vector(const Vector &copy) {
         for (int i = 0; i < 3; i++)
@@ -27,9 +26,6 @@ public:
         for (int i = 0; i < 3; i++)
             data[i] = copy.data[i];
         return *this;
-    }
-
-    ~Vector() {
     }
 
     double x() const {

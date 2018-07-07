@@ -6,40 +6,30 @@
 #include "Shapes/Shape.h"
 #include "Backgrounds/Background.h"
 
-#include <math.h>
-#include <float.h>
+#include <cmath>
+#include <cfloat>
 #include <iostream>
 #include <thread>
 #include "Sample.h"
 
-Camera::Camera(const Vector &eye, const Vector &lookAt, const Vector &up, const Vector &right) : eye(eye), lookAt(lookAt), up(up), right(right){
-    focalLength = 1.0;
-    sampleCount = 25;
-    apertureSize = 0.0;
-}
+Camera::Camera(const Vector &position, const Vector &lookAt, const unsigned int xResolution, const unsigned int yResolution) : position(position), lookAt(lookAt), xResolution(xResolution), yResolution(yResolution) {}
 
 Camera::~Camera() {
 }
 
-void Camera::preprocess(double aspect_ratio) {
-    right *= aspect_ratio;
-}
-
 Ray Camera::makeRay(double x, double y, double r1, double r2) const {
-
     Vector base = right * x + up * y;
-    Vector centered = base - Vector(right.x()/2.0, up.y()/2.0, 0.0);
 
     Vector U = r1 * apertureSize * up;
     Vector V = r2 * apertureSize * right;
-    Vector UV = U+V;
+    Vector UV = U + V;
 
-    Vector direction = centered + lookAt;
+    Vector direction = base + lookAt;
     direction = (direction * focalLength) - UV;
 
     direction.normalize();
 
-    Vector origin = eye + UV;
+    Vector origin = position + UV;
 
     return Ray(origin, direction);
 }
@@ -47,21 +37,25 @@ Ray Camera::makeRay(double x, double y, double r1, double r2) const {
 Image* Camera::render(Scene *scene, double time) {
 
     Image *image = new Image(xResolution, yResolution);
-    preprocess(image->aspect_ratio());
-
+    
     if (cameraMode == PhotonMapTrace){
         scene->buildPhotonMap(time);
     }
 
-    double dx = 1.0 / xResolution;
-    double xmin = 0.0;
-    double dy = 1.0 / yResolution;
-    double ymin = 0.0;
+    double theta = fieldOfView * (M_PI / 180.0); 
+    double aspectRatio = (double)yResolution / (double)xResolution;
+    double halfWidth = tan(theta / 2);
+    double dx = (halfWidth * 2.0) / (double)xResolution;
+    double xmin = -halfWidth;
+    double dy = (halfWidth * 2.0 * aspectRatio) / (double)yResolution;
+    double ymin = -halfWidth * aspectRatio;
+
+    std::cout << "Rendering..." << std::endl;
 
 #pragma omp parallel for schedule(dynamic, 1)
     for (int i = 0; i < yResolution; i++) {
-        if (i % 50 == 0){
-            std::cout << "Completed " << ((double)i/(double)yResolution)*100 << " %" << std::endl;
+        if (i % (yResolution / 10) == 0){
+            std::cout << "*";
         }
         double y = ymin + i * dy;
         for (int j = 0; j < xResolution; j+=1) {
@@ -70,6 +64,8 @@ Image* Camera::render(Scene *scene, double time) {
             image->set(j, i, finalColor);
         }
     }
+
+    std::cout << std::endl << "Complete" << std::endl;
 
     return image;
 }
@@ -100,12 +96,12 @@ Color Camera::samplePixel(const Scene* scene, double x, double y, int time) cons
 
         auto pixelXSample = pixelXSamples[xDist[k]];
         auto pixelYSample = pixelYSamples[yDist[k]];
-        auto timeSample = timeSamples[k];
-        auto dofXSample = dofXSamples[xDist[k]];
-        auto dofYSample = dofYSamples[yDist[k]];
+        auto timeSample   = timeSamples[k];
+        auto dofXSample   = dofXSamples[xDist[k]];
+        auto dofYSample   = dofYSamples[yDist[k]];
 
-        double xOffset = pixelXSample/(xResolution);
-        double yOffset = pixelYSample/(yResolution);
+        double xOffset    = pixelXSample / (xResolution);
+        double yOffset    = pixelYSample / (yResolution);
         double timeOffset = timeSample*0.33;
 
         //if (timeOffset > 0.0)

@@ -1,5 +1,3 @@
-#include <float.h>
-#include <curses.h>
 #include "BezierCurve.h"
 #include "../HitRecord.h"
 #include "../Ray.h"

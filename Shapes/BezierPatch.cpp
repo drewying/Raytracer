@@ -1,5 +1,4 @@
-#include <float.h>
-#include <curses.h>
+#include <cfloat>
 #include "BezierPatch.h"
 #include "../HitRecord.h"
 #include "../Ray.h"
@@ -74,10 +73,9 @@ BoundingBox BezierPatch::getBounds(const double time) const {
     return boundingBox;
 }
 
-std::vector<Shape*> BezierPatch::tesselate(int resolution) const {
+std::vector<Shape*> BezierPatch::tesselate(const int resolution) const {
     std::vector<Shape*> triangles;
-
-    Vector points[resolution+1][resolution+1];
+    std::vector<std::vector<Vector>> points;
 
     for (int i = 0; i <= resolution; i++) {
         double u = (double)i / (double)resolution;

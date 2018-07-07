@@ -1,7 +1,7 @@
 #ifndef BOUNDINGBOX_H
 #define BOUNDINGBOX_H
 
-#include <float.h>
+#include <cfloat>
 #include "Vector.h"
 #include "Ray.h"
 

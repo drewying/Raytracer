@@ -1,5 +1,4 @@
 #include <iostream>
-#include <MacTypes.h>
 #include "MetalMaterial.h"
 #include "../HitRecord.h"
 #include "../Lights/Light.h"

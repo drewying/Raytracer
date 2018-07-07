@@ -1,5 +1,4 @@
-#include <float.h>
-#include <curses.h>
+#include <cfloat>
 #include "ShapeInstance.h"
 #include "Shape.h"
 

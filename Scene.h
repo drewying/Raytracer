@@ -26,22 +26,12 @@ public:
         shapes.push_back(obj);
     }
 
-    void addLight(Light *light) {
-        lights.push_back(light);
-    }
-
     inline Background *getBackground() const {
         return background;
     }
 
     void setBackground(Background *bg) {
         background = bg;
-    }
-
-
-
-    const std::vector<Light *> &getLights() const {
-        return lights;
     }
 
     Color getAmbient() const {
@@ -51,10 +41,6 @@ public:
     void setAmbient(const Color &amb) {
         ambient = amb;
     }
-
-    void preprocess();
-
-    void render();
 
     Color traceRay(const Ray &ray, int time) const;
 
@@ -77,7 +63,6 @@ private:
     Background *background;
     Color ambient;
 
-    std::vector<Light*> lights;
     std::vector<Shape*> shapes;
 
 };
